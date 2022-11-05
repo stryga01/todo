@@ -19,5 +19,5 @@ const TaskList = (props) => {
   })
   return <ul className="todo-list">{taskList}</ul>
 }
-
+const name = 0
 export default TaskList

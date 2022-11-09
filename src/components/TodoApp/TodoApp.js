@@ -13,7 +13,6 @@ export default class TodoApp extends Component {
       tasks: [],
       currentFilter: 'all',
     }
-
     this.filteredTasks = () => {
       const { tasks, currentFilter } = this.state
       if (currentFilter === 'active') {

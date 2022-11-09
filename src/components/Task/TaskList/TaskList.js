@@ -1,7 +1,7 @@
 import React from 'react'
 
-import './task-list.css'
-import TaskItem from '../task-item/task-item.js'
+import './TaskList.css'
+import TaskItem from '../TaskItem/TaskItem'
 
 const TaskList = (props) => {
   const { tasks, onDeleted, onToggleDone, onEditingTask } = props

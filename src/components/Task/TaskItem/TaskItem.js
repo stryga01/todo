@@ -1,6 +1,6 @@
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
-import './task-item.css'
+import './TaskItem.css'
 
 export default class TaskItem extends React.Component {
   constructor() {
@@ -39,6 +39,7 @@ export default class TaskItem extends React.Component {
   render() {
     const { onDeleted, onToggleDone, task } = this.props
     const { content, done, updated, creationDate, updatedDate } = task
+    const { onChangeEditing, onPressEnter, onToggleEditing } = this
     const { editing } = this.state
 
     return (
@@ -52,17 +53,17 @@ export default class TaskItem extends React.Component {
               {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago
             </span>
           </label>
-          <button className="icon icon-edit" onClick={this.onToggleEditing}></button>
-          <button className="icon icon-destroy" onClick={onDeleted}></button>
+          <button className="icon icon-edit" onClick={this.onToggleEditing} />
+          <button className="icon icon-destroy" onClick={onDeleted} />
         </div>
         {editing ? (
           <input
             type="text"
             className="edit"
-            onChange={this.onChangeEditing}
-            onKeyPress={this.onPressEnter}
+            onChange={onChangeEditing}
+            onKeyPress={onPressEnter}
             value={content}
-            onBlur={this.onToggleEditing}
+            onBlur={onToggleEditing}
             autoFocus
           />
         ) : null}

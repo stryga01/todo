@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 
-import TodoApp from './components/todo-app/todo-app.js'
+import TodoApp from './components/TodoApp/TodoApp.js'
 
 import './index.css'
 

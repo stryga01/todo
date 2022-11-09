@@ -1,28 +1,24 @@
 import React, { Component } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
-import './todo-app.css'
-import NewTaskForm from '../new-task-form/new-task-form'
-import TaskList from '../task-list/task-list'
-import Footer from '../footer/footer'
+import './TodoApp.css'
+import NewTaskForm from '../NewTaskForm/NewTaskForm'
+import Footer from '../Footer/Footer'
+import TaskList from '../Task/TaskList/TaskList'
 
 export default class TodoApp extends Component {
   constructor() {
     super()
     this.state = {
-      id: 1,
       tasks: [],
-      filters: {
-        all: true,
-        active: false,
-        completed: false,
-      },
+      currentFilter: 'all',
     }
+
     this.filteredTasks = () => {
-      const { tasks } = this.state
-      const { active, completed } = this.state.filters
-      if (active) {
+      const { tasks, currentFilter } = this.state
+      if (currentFilter === 'active') {
         return tasks.filter((task) => !task.done)
-      } else if (completed) {
+      } else if (currentFilter === 'completed') {
         return tasks.filter((task) => task.done)
       } else {
         return [...tasks]
@@ -44,17 +40,12 @@ export default class TodoApp extends Component {
 
     this.onToggleFilters = (filterName) => {
       this.setState(() => {
-        const newFilters = {
-          all: false,
-          active: false,
-          completed: false,
-        }
-        newFilters[filterName] = true
         return {
-          filters: newFilters,
+          currentFilter: filterName,
         }
       })
     }
+
     this.getIndexInArray = (arr, id) => {
       return arr.findIndex((el) => el.id === id)
     }
@@ -63,7 +54,7 @@ export default class TodoApp extends Component {
       return {
         content,
         done: false,
-        id: this.state.id++,
+        id: uuidv4(),
         creationDate: new Date(),
         updated: false,
       }
@@ -103,14 +94,10 @@ export default class TodoApp extends Component {
         }
       })
     }
-
-    this.getDoneCount = () => {
-      return this.state.tasks.filter((task) => !task.done).length
-    }
   }
 
   render() {
-    const { tasks, filters } = this.state
+    const { tasks, currentFilter } = this.state
     return (
       <section className="todoapp">
         <header className="header">
@@ -121,14 +108,13 @@ export default class TodoApp extends Component {
           <TaskList
             tasks={this.filteredTasks()}
             onEditingTask={(id, text) => this.onEditingTask(id, text)}
-            filters={filters}
+            currentFilter={currentFilter}
             onDeleted={(id) => this.deleteTask(id)}
             onToggleDone={(id) => this.onToggleDone(id)}
           />
           <Footer
             tasks={tasks}
-            doneCount={this.getDoneCount()}
-            filters={filters}
+            currentFilter={currentFilter}
             onToggleFilters={(filterName) => this.onToggleFilters(filterName)}
             onClearCompleted={() => this.deleteAllDoneTasks()}
           />

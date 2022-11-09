@@ -39,7 +39,7 @@ export default class TaskItem extends React.Component {
   render() {
     const { onDeleted, onToggleDone, task } = this.props
     const { content, done, updated, creationDate, updatedDate } = task
-    const { onChangeEditing, onPressEnter, onToggleEditing } = this
+    const { onChangeEditing, onPressEnter, onToggleEditing } = this.state
     const { editing } = this.state
 
     return (

@@ -4,14 +4,13 @@ import { formatDistanceToNow } from 'date-fns'
 import './TaskItem.css'
 
 export default class TaskItem extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      editing: false,
-    }
+  state = {
+    editing: false,
+  }
 
-    this.onToggleEditing = () => {
-      const { task, onDeleted } = this.props
+  onPressEnter = (e) => {
+    const { task, onDeleted } = this.props
+    if (e.key === 'Enter') {
       if (!task.content) onDeleted(task.id)
       this.setState(({ editing }) => {
         return {
@@ -19,22 +18,21 @@ export default class TaskItem extends React.Component {
         }
       })
     }
-    this.onPressEnter = (e) => {
-      const { task, onDeleted } = this.props
-      if (e.key === 'Enter') {
-        if (!task.content) onDeleted(task.id)
-        this.setState(({ editing }) => {
-          return {
-            editing: !editing,
-          }
-        })
-      }
-    }
+  }
 
-    this.onChangeEditing = (e) => {
-      const { onEditingTask, task } = this.props
-      onEditingTask(task.id, e.target.value)
-    }
+  onChangeEditing = (e) => {
+    const { onEditingTask, task } = this.props
+    onEditingTask(task.id, e.target.value)
+  }
+
+  onToggleEditing = () => {
+    const { task, onDeleted } = this.props
+    if (!task.content) onDeleted(task.id)
+    this.setState(({ editing }) => {
+      return {
+        editing: !editing,
+      }
+    })
   }
 
   render() {
@@ -46,15 +44,17 @@ export default class TaskItem extends React.Component {
     return (
       <li className={editing ? 'editing' : done ? 'completed' : undefined}>
         <div className="view">
-          <input className="toggle" type="checkbox" onChange={onToggleDone} defaultChecked={done} />
+          <input className="toggle" type="checkbox" onChange={onToggleDone} checked={done} />
           <label>
-            <span className="description">{content}</span>
+            <span className="description" onClick={onToggleDone}>
+              {content}
+            </span>
             <span className="created">
               {updated ? 'updated ' : 'created '}
               {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago
             </span>
           </label>
-          <button className="icon icon-edit" onClick={onToggleEditing} />
+          <button className="icon icon-edit" onClick={this.onToggleEditing} />
           <button className="icon icon-destroy" onClick={onDeleted} />
         </div>
         {editing ? (

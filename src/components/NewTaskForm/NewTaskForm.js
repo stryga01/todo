@@ -14,10 +14,16 @@ export default class NewTaskForm extends Component {
 
     this.onSubmit = (e) => {
       if (e.key === 'Enter') {
-        this.props.createNewTask(this.state.newTaskText)
-        this.setState({
-          newTaskText: '',
-        })
+        if (!this.state.newTaskText) {
+          this.setState({
+            newTaskText: '',
+          })
+        } else {
+          this.props.createNewTask(this.state.newTaskText)
+          this.setState({
+            newTaskText: '',
+          })
+        }
       }
     }
   }

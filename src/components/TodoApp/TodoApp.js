@@ -7,91 +7,89 @@ import Footer from '../Footer/Footer'
 import TaskList from '../Task/TaskList/TaskList'
 
 export default class TodoApp extends Component {
-  constructor() {
-    super()
-    this.state = {
-      tasks: [],
-      currentFilter: 'all',
-    }
-    this.filteredTasks = () => {
-      const { tasks, currentFilter } = this.state
-      if (currentFilter === 'active') {
-        return tasks.filter((task) => !task.done)
-      } else if (currentFilter === 'completed') {
-        return tasks.filter((task) => task.done)
-      } else {
-        return [...tasks]
-      }
-    }
+  state = {
+    tasks: [],
+    currentFilter: 'all',
+  }
 
-    this.onEditingTask = (id, text) => {
-      this.setState(({ tasks }) => {
-        const idx = this.getIndexInArray(tasks, id)
-        return {
-          tasks: [
-            ...tasks.slice(0, idx),
-            { ...tasks[idx], content: text, updatedDate: new Date(), updated: true },
-            ...tasks.slice(idx + 1),
-          ],
-        }
-      })
-    }
-
-    this.onToggleFilters = (filterName) => {
-      this.setState(() => {
-        return {
-          currentFilter: filterName,
-        }
-      })
-    }
-
-    this.getIndexInArray = (arr, id) => {
-      return arr.findIndex((el) => el.id === id)
-    }
-
-    this.createTask = (content) => {
+  onEditingTask = (id, text) => {
+    this.setState(({ tasks }) => {
+      const idx = this.getIndexInArray(tasks, id)
       return {
-        content,
-        done: false,
-        id: uuidv4(),
-        creationDate: new Date(),
-        updated: false,
+        tasks: [
+          ...tasks.slice(0, idx),
+          { ...tasks[idx], content: text, updatedDate: new Date(), updated: true },
+          ...tasks.slice(idx + 1),
+        ],
       }
-    }
+    })
+  }
 
-    this.addNewTask = (text) => {
-      this.setState(({ tasks }) => {
-        return {
-          tasks: [...tasks, this.createTask(text)],
-        }
-      })
-    }
+  onToggleFilters = (filterName) => {
+    this.setState(() => {
+      return {
+        currentFilter: filterName,
+      }
+    })
+  }
 
-    this.deleteTask = (id) => {
-      this.setState(({ tasks }) => {
-        const idx = this.getIndexInArray(tasks, id)
-        return {
-          tasks: [...tasks.slice(0, idx), ...tasks.slice(idx + 1)],
-        }
-      })
-    }
+  getIndexInArray = (arr, id) => {
+    return arr.findIndex((el) => el.id === id)
+  }
 
-    this.onToggleDone = (id) => {
-      this.setState(({ tasks }) => {
-        const idx = this.getIndexInArray(tasks, id)
-        const newTask = { ...tasks[idx], done: !tasks[idx].done }
-        return {
-          tasks: [...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)],
-        }
-      })
+  createTask = (content) => {
+    return {
+      content,
+      done: false,
+      id: uuidv4(),
+      creationDate: new Date(),
+      updated: false,
     }
+  }
 
-    this.deleteAllDoneTasks = () => {
-      this.setState(({ tasks }) => {
-        return {
-          tasks: tasks.filter((task) => !task.done),
-        }
-      })
+  addNewTask = (text) => {
+    this.setState(({ tasks }) => {
+      return {
+        tasks: [...tasks, this.createTask(text)],
+      }
+    })
+  }
+
+  deleteTask = (id) => {
+    this.setState(({ tasks }) => {
+      const idx = this.getIndexInArray(tasks, id)
+      return {
+        tasks: [...tasks.slice(0, idx), ...tasks.slice(idx + 1)],
+      }
+    })
+  }
+
+  onToggleDone = (id) => {
+    this.setState(({ tasks }) => {
+      const idx = this.getIndexInArray(tasks, id)
+      const newTask = { ...tasks[idx], done: !tasks[idx].done }
+      return {
+        tasks: [...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)],
+      }
+    })
+  }
+
+  deleteAllDoneTasks = () => {
+    this.setState(({ tasks }) => {
+      return {
+        tasks: tasks.filter((task) => !task.done),
+      }
+    })
+  }
+
+  filteredTasks = () => {
+    const { tasks, currentFilter } = this.state
+    if (currentFilter === 'active') {
+      return tasks.filter((task) => !task.done)
+    } else if (currentFilter === 'completed') {
+      return tasks.filter((task) => task.done)
+    } else {
+      return [...tasks]
     }
   }
 

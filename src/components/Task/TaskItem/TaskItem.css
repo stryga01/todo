@@ -70,6 +70,7 @@
 }
 
 .todo-list li label .description {
+  cursor: pointer;
   word-break: break-all;
   display: block;
   line-height: 1.2;

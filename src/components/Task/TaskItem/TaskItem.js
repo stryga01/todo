@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 import './TaskItem.css'
 
@@ -70,4 +71,16 @@ export default class TaskItem extends React.Component {
       </li>
     )
   }
+}
+TaskItem.defaultProps = {
+  onDeleted: () => {},
+  onToggleDone: () => {},
+  onEditingTask: () => {},
+  task: {},
+}
+TaskItem.propTypes = {
+  task: PropTypes.object,
+  onDeleted: PropTypes.func,
+  onToggleDone: PropTypes.func,
+  onEditingTask: PropTypes.func,
 }

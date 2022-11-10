@@ -20,22 +20,17 @@ export default class NewTaskForm extends Component {
         })
       }
     }
-
-    this.onBlur = () => {
-      this.props.createNewTask(this.state.newTaskText)
-      this.setState({
-        newTaskText: '',
-      })
-    }
   }
 
   render() {
+    const { onChangeInput, onSubmit } = this
+    const { newTaskText } = this.state
     return (
       <input
         className="new-todo"
-        onChange={this.onChangeInput}
-        onKeyPress={this.onSubmit}
-        value={this.state.newTaskText}
+        onChange={onChangeInput}
+        onKeyPress={onSubmit}
+        value={newTaskText}
         placeholder="What needs to be done?"
         autoFocus
       />

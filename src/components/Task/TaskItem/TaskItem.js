@@ -49,6 +49,11 @@ export default class TaskItem extends React.Component {
             <span className="description" onClick={onToggleDone}>
               {content}
             </span>
+            <span className="description">
+              <button className="icon icon-play" />
+              <button className="icon icon-pause" />
+              12:25
+            </span>
             <span className="created">
               {updated ? 'updated ' : 'created '}
               {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago

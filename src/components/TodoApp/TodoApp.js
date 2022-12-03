@@ -10,6 +10,7 @@ export default class TodoApp extends Component {
   state = {
     tasks: [],
     currentFilter: 'all',
+    currentTaskTimer: null,
   }
 
   onEditingTask = (id, text) => {
@@ -37,20 +38,22 @@ export default class TodoApp extends Component {
     return arr.findIndex((el) => el.id === id)
   }
 
-  createTask = (content) => {
+  createTask = (content, min, sec) => {
     return {
       content,
       done: false,
       id: uuidv4(),
       creationDate: new Date(),
       updated: false,
+      min: min ? min : 0,
+      sec: sec ? sec : 0,
     }
   }
 
-  addNewTask = (text) => {
+  addNewTask = (text, min, sec) => {
     this.setState(({ tasks }) => {
       return {
-        tasks: [...tasks, this.createTask(text)],
+        tasks: [...tasks, this.createTask(text, min, sec)],
       }
     })
   }
@@ -70,6 +73,18 @@ export default class TodoApp extends Component {
       const newTask = { ...tasks[idx], done: !tasks[idx].done }
       return {
         tasks: [...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)],
+      }
+    })
+  }
+
+  setTime = (id, min, sec) => {
+    this.setState(({ tasks }) => {
+      const idx = this.getIndexInArray(tasks, id)
+      if (tasks[idx]) {
+        const newTask = { ...tasks[idx], min: min, sec: sec }
+        return {
+          tasks: [...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)],
+        }
       }
     })
   }
@@ -99,10 +114,11 @@ export default class TodoApp extends Component {
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-          <NewTaskForm createNewTask={(text) => this.addNewTask(text)} />
+          <NewTaskForm createNewTask={this.addNewTask} />
         </header>
         <section className="main">
           <TaskList
+            setTime={this.setTime}
             tasks={this.filteredTasks()}
             onEditingTask={(id, text) => this.onEditingTask(id, text)}
             currentFilter={currentFilter}

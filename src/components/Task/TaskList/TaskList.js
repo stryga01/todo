@@ -5,16 +5,18 @@ import PropTypes from 'prop-types'
 import TaskItem from '../TaskItem/TaskItem'
 
 const TaskList = (props) => {
-  const { tasks, onDeleted, onToggleDone, onEditingTask } = props
+  const { tasks, onDeleted, onToggleDone, onEditingTask, startTimer, setTime } = props
 
   const taskList = tasks.map((task) => {
     return (
       <TaskItem
         task={task}
+        setTime={setTime}
         key={task.id}
         onEditingTask={(id, text) => onEditingTask(id, text)}
         onDeleted={() => onDeleted(task.id)}
         onToggleDone={() => onToggleDone(task.id)}
+        startTimer={startTimer}
       />
     )
   })

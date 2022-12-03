@@ -81,7 +81,6 @@ export default class TaskItem extends React.Component {
       }
     })
   }
-
   onToggleDoneHandler = () => {
     const { onToggleDone } = this.props
     this.onStopHandler()

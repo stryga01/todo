@@ -1,110 +1,78 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import './NewTaskForm.css'
 
-export default class NewTaskForm extends Component {
-  state = {
-    newTaskText: '',
-    min: '',
-    sec: '',
-  }
+const NewTaskForm = (props) => {
+  const [newTaskText, setNewTaskText] = useState('')
+  const [sec, setSec] = useState(0)
+  const [min, setMin] = useState(0)
 
-  onChangeText = (e) => {
-    this.setState({
-      newTaskText: e.target.value,
-    })
-  }
-
-  onChangeMin = (e) => {
+  const onChangeMin = (e) => {
     const { value: minutes } = e.target
     if (minutes < 0 || isNaN(minutes)) {
-      this.setState(({ min }) => {
-        min
-      })
+      setMin((min) => min)
     } else {
-      this.setState(() => {
-        return {
-          min: Number(minutes),
-        }
-      })
+      setMin(Number(minutes))
     }
   }
-  onChangeSec = (e) => {
+  const onChangeSec = (e) => {
     const { value: seconds } = e.target
     if (seconds < 0 || isNaN(seconds)) {
-      this.setState(({ sec }) => {
-        sec
-      })
+      setSec((sec) => sec)
     } else {
-      this.setState(() => {
-        return {
-          sec: Number(seconds) > 59 ? 59 : Number(seconds),
-        }
-      })
+      setSec(Number(seconds) > 59 ? 59 : Number(seconds))
     }
   }
 
-  onFocusHandler = () => {
-    this.setState(({ min, sec }) => {
-      return {
-        min: min ? min : '',
-        sec: sec ? sec : '',
-      }
-    })
+  const onBlurHandler = () => {
+    setMin((min) => (min ? min : 0))
+    setSec((sec) => (sec ? sec : 0))
   }
 
-  onSubmit = (e) => {
-    const { newTaskText, min, sec } = this.state
-    const { createNewTask } = this.props
+  const onSubmit = (e) => {
+    const { addTask } = props
     if (e.key === 'Enter') {
       if (!newTaskText) {
-        this.setState({
-          newTaskText: '',
-          min: '',
-          sec: '',
-        })
+        setNewTaskText('')
+        setMin(0)
+        setSec(0)
       } else {
-        createNewTask(newTaskText, min, sec)
-        this.setState({
-          newTaskText: '',
-          min: '',
-          sec: '',
-        })
+        addTask(newTaskText, min, sec)
+        setNewTaskText('')
+        setMin(0)
+        setSec(0)
       }
     }
   }
 
-  render() {
-    const { onChangeText, onChangeMin, onChangeSec, onSubmit, onFocusHandler } = this
-    const { newTaskText, min, sec } = this.state
-    return (
-      <form className="new-todo-form">
-        <input
-          className="new-todo"
-          onChange={onChangeText}
-          onKeyPress={onSubmit}
-          value={newTaskText}
-          placeholder="Task"
-          autoFocus
-        />
-        <input
-          className="new-todo-form__timer"
-          onFocus={onFocusHandler}
-          onChange={onChangeMin}
-          onKeyPress={onSubmit}
-          value={min}
-          placeholder="Min"
-          autoFocus
-        />
-        <input
-          className="new-todo-form__timer"
-          onFocus={onFocusHandler}
-          onChange={onChangeSec}
-          onKeyPress={onSubmit}
-          value={sec}
-          placeholder="Sec"
-          autoFocus
-        />
-      </form>
-    )
-  }
+  return (
+    <form className="new-todo-form">
+      <input
+        className="new-todo"
+        onChange={(e) => setNewTaskText(e.target.value)}
+        onKeyPress={onSubmit}
+        value={newTaskText}
+        placeholder="Task"
+        autoFocus
+      />
+      <input
+        className="new-todo-form__timer"
+        onChange={onChangeMin}
+        onBlur={onBlurHandler}
+        onKeyPress={onSubmit}
+        value={min ? min : ''}
+        placeholder="Min"
+        autoFocus
+      />
+      <input
+        className="new-todo-form__timer"
+        onBlur={onBlurHandler}
+        onChange={onChangeSec}
+        onKeyPress={onSubmit}
+        value={sec ? sec : ''}
+        placeholder="Sec"
+        autoFocus
+      />
+    </form>
+  )
 }
+export default NewTaskForm

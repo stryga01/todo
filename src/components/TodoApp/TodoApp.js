@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 import './TodoApp.css'
@@ -6,39 +6,42 @@ import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import Footer from '../Footer/Footer'
 import TaskList from '../Task/TaskList/TaskList'
 
-export default class TodoApp extends Component {
-  state = {
-    tasks: [],
-    currentFilter: 'all',
-    currentTaskTimer: null,
+const TodoApp = () => {
+  const [tasks, setTasks] = useState([])
+  const [currentFilter, setCurrentFilter] = useState('all')
+
+  const setTime = (id, min, sec) => {
+    const idx = getIndexInArray(tasks, id)
+    if (tasks[idx]) {
+      const newTask = { ...tasks[idx], min: min, sec: sec }
+      setTasks([...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)])
+    }
   }
 
-  onEditingTask = (id, text) => {
-    this.setState(({ tasks }) => {
-      const idx = this.getIndexInArray(tasks, id)
-      return {
-        tasks: [
-          ...tasks.slice(0, idx),
-          { ...tasks[idx], content: text, updatedDate: new Date(), updated: true },
-          ...tasks.slice(idx + 1),
-        ],
-      }
-    })
-  }
-
-  onToggleFilters = (filterName) => {
-    this.setState(() => {
-      return {
-        currentFilter: filterName,
-      }
-    })
-  }
-
-  getIndexInArray = (arr, id) => {
+  const getIndexInArray = (arr, id) => {
     return arr.findIndex((el) => el.id === id)
   }
 
-  createTask = (content, min, sec) => {
+  const onToggleDone = (id) => {
+    const idx = getIndexInArray(tasks, id)
+    const newTask = { ...tasks[idx], done: !tasks[idx].done }
+    setTasks([...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)])
+  }
+
+  const onEditingTask = (id, text) => {
+    const idx = getIndexInArray(tasks, id)
+    setTasks([
+      ...tasks.slice(0, idx),
+      { ...tasks[idx], content: text, updatedDate: new Date(), updated: true },
+      ...tasks.slice(idx + 1),
+    ])
+  }
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((task) => task.id !== id))
+  }
+
+  const createTask = (content, min, sec) => {
     return {
       content,
       done: false,
@@ -50,55 +53,11 @@ export default class TodoApp extends Component {
     }
   }
 
-  addNewTask = (text, min, sec) => {
-    this.setState(({ tasks }) => {
-      return {
-        tasks: [...tasks, this.createTask(text, min, sec)],
-      }
-    })
+  const addTask = (content, min, sec) => {
+    setTasks([...tasks, createTask(content, min, sec)])
   }
 
-  deleteTask = (id) => {
-    this.setState(({ tasks }) => {
-      const idx = this.getIndexInArray(tasks, id)
-      return {
-        tasks: [...tasks.slice(0, idx), ...tasks.slice(idx + 1)],
-      }
-    })
-  }
-
-  onToggleDone = (id) => {
-    this.setState(({ tasks }) => {
-      const idx = this.getIndexInArray(tasks, id)
-      const newTask = { ...tasks[idx], done: !tasks[idx].done }
-      return {
-        tasks: [...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)],
-      }
-    })
-  }
-
-  setTime = (id, min, sec) => {
-    this.setState(({ tasks }) => {
-      const idx = this.getIndexInArray(tasks, id)
-      if (tasks[idx]) {
-        const newTask = { ...tasks[idx], min: min, sec: sec }
-        return {
-          tasks: [...tasks.slice(0, idx), newTask, ...tasks.slice(idx + 1)],
-        }
-      }
-    })
-  }
-
-  deleteAllDoneTasks = () => {
-    this.setState(({ tasks }) => {
-      return {
-        tasks: tasks.filter((task) => !task.done),
-      }
-    })
-  }
-
-  filteredTasks = () => {
-    const { tasks, currentFilter } = this.state
+  const filteredTasks = () => {
     if (currentFilter === 'active') {
       return tasks.filter((task) => !task.done)
     } else if (currentFilter === 'completed') {
@@ -108,31 +67,34 @@ export default class TodoApp extends Component {
     }
   }
 
-  render() {
-    const { tasks, currentFilter } = this.state
-    return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-          <NewTaskForm createNewTask={this.addNewTask} />
-        </header>
-        <section className="main">
-          <TaskList
-            setTime={this.setTime}
-            tasks={this.filteredTasks()}
-            onEditingTask={(id, text) => this.onEditingTask(id, text)}
-            currentFilter={currentFilter}
-            onDeleted={(id) => this.deleteTask(id)}
-            onToggleDone={(id) => this.onToggleDone(id)}
-          />
-          <Footer
-            tasks={tasks}
-            currentFilter={currentFilter}
-            onToggleFilters={(filterName) => this.onToggleFilters(filterName)}
-            onClearCompleted={() => this.deleteAllDoneTasks()}
-          />
-        </section>
-      </section>
-    )
+  const deleteAllDoneTasks = () => {
+    setTasks(tasks.filter((task) => !task.done))
   }
+
+  return (
+    <section className="todoapp">
+      <header className="header">
+        <h1>todos</h1>
+        <NewTaskForm addTask={addTask} />
+      </header>
+      <section className="main">
+        <TaskList
+          tasks={filteredTasks()}
+          setTime={setTime}
+          onToggleDone={onToggleDone}
+          onEditingTask={onEditingTask}
+          deleteTask={deleteTask}
+          addTask={addTask}
+        />
+        <Footer
+          tasks={tasks}
+          currentFilter={currentFilter}
+          setCurrentFilter={setCurrentFilter}
+          deleteAllDoneTasks={deleteAllDoneTasks}
+        />
+      </section>
+    </section>
+  )
 }
+
+export default TodoApp

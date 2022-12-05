@@ -3,11 +3,11 @@ import './Filters.css'
 import PropTypes from 'prop-types'
 
 const TaskFilter = (props) => {
-  const { currentFilter, onToggleFilters } = props
+  const { currentFilter, setCurrentFilter } = props
   const filterList = ['all', 'active', 'completed'].map((filter) => {
     return (
       <li key={filter}>
-        <button className={filter === currentFilter ? 'selected' : undefined} onClick={() => onToggleFilters(filter)}>
+        <button className={filter === currentFilter ? 'selected' : undefined} onClick={() => setCurrentFilter(filter)}>
           {filter}
         </button>
       </li>

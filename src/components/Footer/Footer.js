@@ -4,12 +4,16 @@ import PropTypes from 'prop-types'
 
 import Filters from '../Filters/Filters'
 
-const Footer = ({ currentFilter, tasks, onToggleFilters, onClearCompleted }) => {
+const Footer = ({ currentFilter, tasks, onToggleFilters, setCurrentFilter, deleteAllDoneTasks }) => {
   return (
     <footer className="footer">
       <span className="todo-count">{tasks.filter((task) => !task.done).length} items left</span>
-      <Filters currentFilter={currentFilter} onToggleFilters={(filterName) => onToggleFilters(filterName)} />
-      <button className="clear-completed" onClick={onClearCompleted}>
+      <Filters
+        currentFilter={currentFilter}
+        setCurrentFilter={setCurrentFilter}
+        onToggleFilters={(filterName) => onToggleFilters(filterName)}
+      />
+      <button className="clear-completed" onClick={deleteAllDoneTasks}>
         Clear completed
       </button>
     </footer>

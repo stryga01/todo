@@ -1,145 +1,113 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
 import './TaskItem.css'
 
-export default class TaskItem extends React.Component {
-  state = {
-    editing: false,
-    sec: undefined,
-    min: undefined,
-  }
-  componentDidMount() {
-    this.setState({
-      sec: this.props.task.sec,
-      min: this.props.task.min,
-    })
-  }
+const TaskItem = (props) => {
+  const [editing, setEditing] = useState(false)
+  const [seconds, setSeconds] = useState(undefined)
+  const [minutes, setMinutes] = useState(undefined)
+  const [timerOn, setTimerOn] = useState(false)
+  const [deadline, setDeadline] = useState(undefined)
 
-  componentWillUnmount() {
-    const { timerId, min, sec } = this.state
-    const { id } = this.props.task
-    this.props.setTime(id, min, sec)
-    clearInterval(timerId)
-  }
+  const { onToggleDone, deleteTask, setTime } = props
+  const { content, done, updated, updatedDate, creationDate, id } = props.task
 
-  setSec = () => {
-    const { sec, min } = this.state
-    this.setState(() => {
-      return {
-        sec: sec ? sec - 1 : min ? 59 : 0,
-        min: sec ? min : min ? min - 1 : min,
+  useEffect(() => {
+    setMinutes(props.task.min)
+    setSeconds(props.task.sec)
+  }, [])
+
+  useEffect(() => {
+    setTime(id, minutes, seconds)
+  }, [minutes, seconds])
+
+  useEffect(() => {
+    if (timerOn) {
+      const id = setInterval(tick, 500)
+      return () => {
+        clearInterval(id)
       }
-    })
+    }
+  }, [timerOn, editing, done])
+
+  const tick = () => {
+    const total = deadline - Date.now()
+    const sec = Math.floor((total / 1000) % 60)
+    const min = Math.floor((total / 1000 / 60) % 60)
+
+    if ((sec < 0 && min < 0) || editing || done) {
+      setTimerOn(false)
+      return
+    }
+
+    setSeconds(sec)
+    setMinutes(min)
   }
 
-  onPressEnter = (e) => {
-    const { task, onDeleted } = this.props
+  const onPressEnter = (e) => {
     if (e.key === 'Enter') {
-      if (!task.content) onDeleted(task.id)
-      this.setState(({ editing }) => {
-        return {
-          editing: !editing,
-        }
-      })
+      if (!content) deleteTask(id)
+      setEditing(false)
     }
   }
 
-  onPlayHandler = () => {
-    const { timerId, min, sec } = this.state
-    const { done } = this.props.task
-    if (done || !min & !sec) return
-    if (!timerId) {
-      const id = setInterval(this.setSec, 1000)
-      this.setState({
-        timerId: id,
-      })
-    }
+  const onToggleDoneHandler = () => {
+    const { onToggleDone, task } = props
+    onToggleDone(task.id)
   }
 
-  onStopHandler = () => {
-    const { timerId } = this.state
-    if (timerId) {
-      clearInterval(timerId)
-      this.setState({
-        timerId: 0,
-      })
-    }
-  }
-
-  onChangeEditing = (e) => {
-    const { onEditingTask, task } = this.props
+  const onChangeEditing = (e) => {
+    const { onEditingTask, task } = props
     onEditingTask(task.id, e.target.value)
   }
 
-  onToggleEditing = () => {
-    const { task, onDeleted } = this.props
-    if (!task.content) onDeleted(task.id)
-    this.setState(({ editing }) => {
-      return {
-        editing: !editing,
-      }
-    })
-  }
-  onToggleDoneHandler = () => {
-    const { onToggleDone } = this.props
-    this.onStopHandler()
-    onToggleDone()
+  const onDeleteHandler = () => {
+    setTimerOn(false)
+    deleteTask(id)
   }
 
-  onDeletedHandler = () => {
-    const { onDeleted, task } = this.props
-    const { id } = task
-    this.onStopHandler()
-    onDeleted(id)
+  const startTimer = () => {
+    setTimerOn(true)
+    setDeadline(Date.now() + seconds * 1000 + minutes * 1000 * 60)
   }
 
-  render() {
-    const { content, done, updated, creationDate, updatedDate } = this.props.task
-    const { onChangeEditing, onPressEnter, onPlayHandler, onToggleDoneHandler, onDeletedHandler, onToggleEditing } =
-      this
-    const { editing, sec, min } = this.state
-
-    return (
-      <li className={editing ? 'editing' : done ? 'completed' : undefined}>
-        <div className="view">
-          <input className="toggle" type="checkbox" onChange={onToggleDoneHandler} checked={done} />
-          <label>
-            <span className="title" onClick={onToggleDoneHandler}>
-              {content}
+  return (
+    <li className={editing ? 'editing' : done ? 'completed' : undefined}>
+      <div className="view">
+        <input className="toggle" type="checkbox" onChange={onToggleDoneHandler} checked={done} />
+        <label>
+          <span className="title" onClick={onToggleDone}>
+            {content}
+          </span>
+          <span className="description">
+            <button className={`icon icon-play ${done ? 'disabled' : undefined}`} onClick={startTimer} />
+            <button className={`icon icon-pause ${done ? 'disabled' : undefined} `} onClick={() => setTimerOn(false)} />
+            <span className="todo-timer">
+              {minutes < 10 ? '0' + minutes : minutes}:{seconds < 10 ? '0' + seconds : seconds}
             </span>
-            <span className="description">
-              <button
-                className={`icon icon-play ${done ? 'disabled' : undefined}`}
-                onClick={() => onPlayHandler(this.props.task)}
-              />
-              <button className={`icon icon-pause ${done ? 'disabled' : undefined}`} onClick={this.onStopHandler} />
-              <span className="todo-timer">
-                {min}:{sec}
-              </span>
-            </span>
-            <span className="description">
-              {updated ? 'updated ' : 'created '}
-              {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago
-            </span>
-          </label>
-          <button className="icon icon-edit" onClick={onToggleEditing} />
-          <button className="icon icon-destroy" onClick={onDeletedHandler} />
-        </div>
-        {editing ? (
-          <input
-            type="text"
-            className="edit"
-            onChange={onChangeEditing}
-            onKeyPress={onPressEnter}
-            value={content}
-            onBlur={onToggleEditing}
-            autoFocus
-          />
-        ) : null}
-      </li>
-    )
-  }
+          </span>
+          <span className="description">
+            {updated ? 'updated' : 'created '}
+            {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago
+          </span>
+        </label>
+        <button className="icon icon-edit" onClick={() => setEditing(true)} />
+        <button className="icon icon-destroy" onClick={onDeleteHandler} />
+      </div>
+      {editing ? (
+        <input
+          type="text"
+          className="edit"
+          onChange={onChangeEditing}
+          onKeyPress={onPressEnter}
+          value={content}
+          onBlur={() => setEditing(false)}
+          autoFocus
+        />
+      ) : null}
+    </li>
+  )
 }
 TaskItem.defaultProps = {
   onDeleted: () => {},
@@ -153,3 +121,4 @@ TaskItem.propTypes = {
   onToggleDone: PropTypes.func,
   onEditingTask: PropTypes.func,
 }
+export default TaskItem

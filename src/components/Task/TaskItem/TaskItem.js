@@ -21,7 +21,6 @@ export default class TaskItem extends React.Component {
       })
     }
   }
-
   onChangeEditing = (e) => {
     const { onEditingTask, task } = this.props
     onEditingTask(task.id, e.target.value)
@@ -61,7 +60,7 @@ export default class TaskItem extends React.Component {
             <span className="title" onClick={onToggleDoneHandler}>
               {content}
             </span>
-            <Timer task={this.props.task} editing={this.state.editing} setTime={this.props.setTime} />
+            <Timer task={this.props.task} setTime={this.props.setTime} editing={this.state.editing} />
             <span className="description">
               {updated ? 'updated ' : 'created '}
               {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago

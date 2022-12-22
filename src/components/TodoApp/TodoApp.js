@@ -88,7 +88,6 @@ export default class TodoApp extends Component {
       }
     })
   }
-
   deleteAllDoneTasks = () => {
     this.setState(({ tasks }) => {
       return {

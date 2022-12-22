@@ -7,7 +7,6 @@ export default class NewTaskForm extends Component {
     min: '',
     sec: '',
   }
-
   onChangeText = (e) => {
     this.setState({
       newTaskText: e.target.value,
@@ -28,6 +27,7 @@ export default class NewTaskForm extends Component {
       })
     }
   }
+
   onChangeSec = (e) => {
     const { value: seconds } = e.target
     if (seconds < 0 || isNaN(seconds)) {

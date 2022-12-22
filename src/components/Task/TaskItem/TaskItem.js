@@ -1,36 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
+
 import './TaskItem.css'
+import Timer from '../../Timer/Timer'
 
 export default class TaskItem extends React.Component {
   state = {
     editing: false,
-    sec: undefined,
-    min: undefined,
-  }
-  componentDidMount() {
-    this.setState({
-      sec: this.props.task.sec,
-      min: this.props.task.min,
-    })
-  }
-
-  componentWillUnmount() {
-    const { timerId, min, sec } = this.state
-    const { id } = this.props.task
-    this.props.setTime(id, min, sec)
-    clearInterval(timerId)
-  }
-
-  setSec = () => {
-    const { sec, min } = this.state
-    this.setState(() => {
-      return {
-        sec: sec ? sec - 1 : min ? 59 : 0,
-        min: sec ? min : min ? min - 1 : min,
-      }
-    })
   }
 
   onPressEnter = (e) => {
@@ -41,28 +18,6 @@ export default class TaskItem extends React.Component {
         return {
           editing: !editing,
         }
-      })
-    }
-  }
-
-  onPlayHandler = () => {
-    const { timerId, min, sec } = this.state
-    const { done } = this.props.task
-    if (done || !min & !sec) return
-    if (!timerId) {
-      const id = setInterval(this.setSec, 1000)
-      this.setState({
-        timerId: id,
-      })
-    }
-  }
-
-  onStopHandler = () => {
-    const { timerId } = this.state
-    if (timerId) {
-      clearInterval(timerId)
-      this.setState({
-        timerId: 0,
       })
     }
   }
@@ -84,22 +39,19 @@ export default class TaskItem extends React.Component {
 
   onToggleDoneHandler = () => {
     const { onToggleDone } = this.props
-    this.onStopHandler()
     onToggleDone()
   }
 
   onDeletedHandler = () => {
     const { onDeleted, task } = this.props
     const { id } = task
-    this.onStopHandler()
     onDeleted(id)
   }
 
   render() {
     const { content, done, updated, creationDate, updatedDate } = this.props.task
-    const { onChangeEditing, onPressEnter, onPlayHandler, onToggleDoneHandler, onDeletedHandler, onToggleEditing } =
-      this
-    const { editing, sec, min } = this.state
+    const { onChangeEditing, onPressEnter, onToggleDoneHandler, onDeletedHandler, onToggleEditing } = this
+    const { editing } = this.state
 
     return (
       <li className={editing ? 'editing' : done ? 'completed' : undefined}>
@@ -109,16 +61,7 @@ export default class TaskItem extends React.Component {
             <span className="title" onClick={onToggleDoneHandler}>
               {content}
             </span>
-            <span className="description">
-              <button
-                className={`icon icon-play ${done ? 'disabled' : undefined}`}
-                onClick={() => onPlayHandler(this.props.task)}
-              />
-              <button className={`icon icon-pause ${done ? 'disabled' : undefined}`} onClick={this.onStopHandler} />
-              <span className="todo-timer">
-                {min}:{sec}
-              </span>
-            </span>
+            <Timer task={this.props.task} editing={this.state.editing} setTime={this.props.setTime} />
             <span className="description">
               {updated ? 'updated ' : 'created '}
               {updated ? formatDistanceToNow(updatedDate) : formatDistanceToNow(creationDate)} ago
